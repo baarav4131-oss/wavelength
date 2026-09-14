@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #0c0e12;
+    --bg-card: #14171f;
+    --bg-card-hover: #1a1e28;
+    --bg-sidebar: #090a0d;
+    --border-subtle: rgba(255, 255, 255, 0.07);
+    --border-highlight: rgba(232, 163, 61, 0.3);
+    
+    --amber-primary: #e8a33d;
+    --amber-light: #f5b95d;
+    --amber-dim: #7a5a2c;
+    --amber-glow: rgba(232, 163, 61, 0.15);
+
+    --teal-accent: #3fc9b0;
+    --teal-glow: rgba(63, 201, 176, 0.15);
+    
+    --text-primary: #f1eee6;
+    --text-secondary: #9aa0ae;
+    --text-muted: #5e6473;
+
+    --font-serif: 'Fraunces', Georgia, serif;
+    --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    border: none;
+    text-align: left;
+    display: block;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-serif);
+  }
+
+  .font-mono, code, pre {
+    font-family: var(--font-mono);
+  }
+
+  /* Custom subtle scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
