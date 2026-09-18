@@ -1,154 +1,208 @@
-﻿# WAVELENGTH — Music Intelligence & Database Studio
+# Music Streamer
 
-> A commercial-grade music intelligence and database operations console built for academic DBMS project demonstration and production REST/SQL backend integration.
-> 
-> Inspired by **Spotify × Supabase × Linear × Modern Database IDEs**.
+A music and podcast streaming platform built with Next.js, Node.js, Express, Oracle Database, and PL/SQL.
 
----
+## Features
 
-## Overview
+- User registration and login
+- JWT authentication
+- Music browsing and playback
+- Artist and album browsing
+- Search
+- Playlist creation and song management
+- Follow/unfollow artists
+- Podcast and episode browsing
+- Premium subscription
+- Payment history
 
-**Wavelength** is a streaming platform administration and data intelligence suite. It allows platform administrators, database engineers, and analytics teams to monitor catalogue ingestion, manage relational entities, test queries in an interactive SQL IDE, and inspect BCNF entity-relationship topologies.
+## Tech Stack
 
-### Core Highlights
-* **Zero Schema Drift**: 100% compliant with all 11 database entities, exact column names, data types, single primary keys, and composite primary keys.
-* **Dual Execution Mode**:
-  * **Demo Mode**: Instant out-of-the-box operation with factory seed data and an in-browser single-table & join SQL engine. No server required.
-  * **Live Mode**: Switches with a single click to talk directly to your team's live REST API (`http://localhost:5000/api`) and raw SQL endpoint (`POST /query`).
-* **Reusable CRUD Engine**: Centralized schema definition drives tables, search bars, multi-column filters, right-side slide-out record drawers, and modal deletion prompts.
-* **SQL Studio**: Lightweight database IDE with formatting, query history, keyboard shortcuts (`Ctrl+Enter`), execution timing (`ms`), row count telemetry, and CSV/JSON export.
-* **Interactive ER Diagram**: Complete visual topology highlighting `🔑 Primary Keys`, `🔗 Foreign Keys`, composite keys, and directional relationships.
-* **Backend Integration Center**: Live interactive endpoint inspector and one-click cURL/Fetch snippet generator for backend teammates.
-
----
-
-## Database Architecture (11 Entities)
-
-The schema enforces Boyce-Codd Normal Form (BCNF) relationships across 3 primary domains:
-
-```text
-[MUSIC]
-Artists (AR) ──< Albums (AL) ──< Songs (SG)
-Users (U) ─────< Playlists (PL)
-
-[PODCASTS]
-Podcast Creators (PC) ──< Podcasts (PD) ──< Episodes (Composite: Podcast_ID + Episode_No)
-
-[ACCOUNTS]
-Users (U) ──< Subscriptions (SUB) ──< Payments (PAY)
-Users (U) ──< Devices (DEV)
-```
-
-### Entity Specifications
-
-| Table | Primary Key | Foreign Key References | Description |
-| :--- | :--- | :--- | :--- |
-| **Users** | `User_ID` | — | Platform listener profiles and account credentials. |
-| **Artists** | `Artist_ID` | — | Recording artists, bands, and contributing producers. |
-| **Albums** | `Album_ID` | `Artist_ID` → `Artists` | Curated musical releases, EPs, and singles. |
-| **Songs** | `Song_ID` | `Album_ID` → `Albums` | Master track catalogue with duration, language, and release date. |
-| **Playlists** | `Playlist_ID` | `User_ID` → `Users` | User-created listening collections (Public/Private). |
-| **Podcast Creators** | `Creator_ID` | — | Show hosts, audio journalists, and executive producers. |
-| **Podcasts** | `Podcast_ID` | `Creator_ID` → `Podcast Creators` | Audio series, broadcast feeds, and talk shows. |
-| **Episodes** | `[Podcast_ID, Episode_No]` *(Composite)* | `Podcast_ID` → `Podcasts` | Individual episodic releases under a parent podcast. |
-| **Subscriptions** | `Subscription_ID` | `User_ID` → `Users` | Tiered access agreements (Free, Premium, Family, Student). |
-| **Payments** | `Payment_ID` | `Subscription_ID` → `Subscriptions` | Gateway transactions (Card, UPI, Wallet, Netbanking). |
-| **Devices** | `Device_ID` | `User_ID` → `Users` | Active streaming endpoints (iOS, Android, macOS, Windows). |
-
----
+- Frontend: Next.js, React, TypeScript
+- Backend: Node.js, Express.js
+- Database: Oracle Database Free 23.x
+- Database Programming: SQL and PL/SQL
+- Authentication: JWT + bcryptjs
 
 ## Project Structure
 
 ```text
-wavelength/
-├── src/
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├── Sidebar.jsx           # Collapsible responsive navigation with live counts
-│   │   │   ├── Topbar.jsx            # Status pill, live mode indicator, quick jump
-│   │   │   ├── PageHeader.jsx        # Standardized page title, badge & actions
-│   │   │   └── ConnectionModal.jsx   # Interactive backend URL test & switch dialog
-│   │   ├── dashboard/
-│   │   │   ├── StatCard.jsx          # KPI card with visual accents and delta metrics
-│   │   │   ├── GrowthChart.jsx       # Custom responsive SVG area chart
-│   │   │   ├── DistributionChart.jsx # Category breakdown visualization
-│   │   │   └── RecentRecords.jsx     # Top catalogued artists & recent playlists
-│   │   ├── data/
-│   │   │   ├── DataTable.jsx         # Sortable, column-aware relational table
-│   │   │   ├── SearchBar.jsx         # Debounced attribute search input
-│   │   │   ├── FilterBar.jsx         # Dynamic select filters per schema
-│   │   │   ├── RecordDrawer.jsx      # Slide-out right panel for Add/Edit
-│   │   │   ├── DeleteDialog.jsx      # Confirmation modal with record identifier
-│   │   │   ├── ForeignKeySelect.jsx  # Searchable foreign key dropdown
-│   │   │   └── Pagination.jsx        # Row limits and page navigation
-│   │   └── ui/
-│   │       ├── Button.jsx            # Standardized primary, ghost, danger buttons
-│   │       ├── Badge.jsx             # Key badges (🔑 PK, 🔗 FK, status pills)
-│   │       ├── Modal.jsx             # Accessible backdrop dialog
-│   │       ├── Toast.jsx             # Non-intrusive action notification toast
-│   │       ├── EmptyState.jsx        # Clean empty-table illustration card
-│   │       └── LoadingSkeleton.jsx   # Animated placeholder loaders
-│   ├── pages/
-│   │   ├── Dashboard.jsx             # Command center with KPIs & analytics
-│   │   ├── EntityPage.jsx            # Reusable engine driving all 11 CRUD views
-│   │   ├── SQLStudio.jsx             # Database IDE with query editor & results
-│   │   ├── ERDiagram.jsx             # Interactive relational schema graph
-│   │   ├── Integration.jsx           # API documentation & live cURL tester
-│   │   └── [Entity].jsx              # Thin entity wrappers (Songs, Users, etc.)
-│   ├── services/
-│   │   └── api.js                    # Unified service layer (Live fetch vs Demo DB)
-│   ├── data/
-│   │   ├── schema.js                 # Central schema definition (Single Source of Truth)
-│   │   └── mockData.js               # Initial factory seed dataset
-│   ├── utils/
-│   │   ├── formatters.js             # Currency, duration, date, and text formatters
-│   │   └── sqlEngine.js              # In-browser client SQL engine for demo mode
-│   ├── App.jsx                       # Main application shell & state orchestration
-│   ├── main.jsx                      # Vite entry point
-│   └── index.css                     # Tailwind design tokens & dark theme styling
-├── README.md                         # This file
-├── API.md                            # Complete backend integration guide
-└── package.json
+music-streaming/
+├── frontend/
+├── backend/
+└── database/
+    ├── 01_tables.sql
+    ├── 02_constraints.sql
+    ├── 02_procedures.sql
+    ├── 03_functions.sql
+    ├── 04_triggers.sql
+    └── 05_seed.sql
 ```
 
----
+## Database
 
-## Installation & Running
+Main tables:
 
-### Prerequisites
-* **Node.js**: v18.0 or higher
-* **npm**: v9.0 or higher
+- APP_USER
+- ARTIST
+- ALBUM
+- SONG
+- PLAYLIST
+- PLAYLIST_SONG
+- USER_ARTIST
+- SUBSCRIPTION
+- PAYMENT
+- DEVICE
+- PODCAST_CREATOR
+- PODCAST
+- EPISODE
 
-### Development Server
+The database also contains PL/SQL procedures, functions, and triggers for application operations and data validation.
+
+## PL/SQL
+
+### Procedures
+
+- REGISTER_USER
+- CREATE_PLAYLIST
+- ADD_SONG_TO_PLAYLIST
+- FOLLOW_ARTIST
+- UNFOLLOW_ARTIST
+- SUBSCRIBE_USER
+
+### Functions
+
+- GET_TOTAL_SONGS
+- GET_PLAYLIST_SONG_COUNT
+- GET_ARTIST_FOLLOWER_COUNT
+- GET_USER_PLAN
+- GET_TOTAL_PAYMENT
+
+### Triggers
+
+- TRG_PLAYLIST_CREATED_DATE
+- TRG_PLAYLIST_VISIBILITY
+- TRG_PAYMENT_DATE
+- TRG_SUBSCRIPTION_DATES
+- TRG_SONG_DURATION
+
+## Media Files
+
+```text
+frontend/public/
+├── audio/
+│   ├── Fur Elise.mp3
+│   ├── Passacaglia.mp3
+│   ├── Running Night.mp3
+│   └── Tell Me What.mp3
+└── images/
+    ├── Fur Elise.jpg
+    ├── Passacaglia.jpg
+    ├── Running Night.jpg
+    └── Tell Me What.jpg
+```
+
+## Setup
+
+### 1. Database
+
+Start Oracle Database and connect to `FREEPDB1`.
+
+Run the SQL files in order:
+
+```text
+01_tables.sql
+02_constraints.sql
+02_procedures.sql
+03_functions.sql
+04_triggers.sql
+05_seed.sql
+```
+
+`02_constraints.sql` is currently an empty file and is kept as part of the project structure.
+
+### 2. Backend
+
 ```bash
-# 1. Clone repository or navigate to directory
-cd wavelength
-
-# 2. Install dependencies
+cd backend
 npm install
+```
 
-# 3. Start local development server
+Create `.env`:
+
+```env
+PORT=5000
+DB_USER=STREAM_APP
+DB_PASSWORD=your_database_password
+DB_CONNECT_STRING=127.0.0.1:1521/freepdb1
+JWT_SECRET=your_jwt_secret
+```
+
+Start the backend:
+
+```bash
+node server.js
+```
+
+Backend URL:
+
+```text
+http://localhost:5000
+```
+
+### 3. Frontend
+
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+## API Routes
 
-### Production Build
-```bash
-npm run build
-npm run preview
+```text
+/api/auth
+/api/songs
+/api/artists
+/api/albums
+/api/playlists
+/api/podcasts
+/api/episodes
+/api/users
+/api/subscriptions
+/api/payments
 ```
 
----
+## Authentication
 
-## Connecting Your Backend (For Teammates)
+- Passwords are hashed using bcryptjs.
+- Login returns a JWT token.
+- The frontend stores the token in localStorage.
+- Protected requests use the `Authorization: Bearer <token>` header.
 
-When the backend team has endpoints ready (e.g. built in Python Flask/FastAPI, Node.js Express, or Go):
+## Subscription and Payment
 
-1. Start your backend server (e.g. on `http://localhost:5000`).
-2. In the Wavelength UI, click the status indicator in the top right (`● DEMO MODE`).
-3. Enter your backend URL: `http://localhost:5000/api`.
-4. Click **Test & Connect**.
-5. The UI will ping `GET /users` on your backend. Upon a 200 response, it transitions to `● LIVE DATABASE`.
+The application supports a Premium subscription flow with payment recording and payment history stored in Oracle.
 
-See [`API.md`](./API.md) for full HTTP request/response specifications and SQL contracts.
+## Git
+
+The root `.gitignore` excludes development files and environment variables such as:
+
+```text
+node_modules/
+.env
+.next/
+dist/
+build/
+*.log
+```
+
+## Project Purpose
+
+This project demonstrates frontend development, REST APIs, Oracle database design, SQL, PL/SQL procedures, functions, triggers, authentication, playlists, artist follows, subscriptions, payments, music playback, and podcast functionality.
+
+## Repository
+
+https://github.com/jovanajeboy/Music-Streamer-using-SQL-PL-SQL.git
+
+
+This project was created for academic/college project purposes.
